@@ -2,6 +2,24 @@
 const prompt = ref('')
 const loading = ref(false)
 const historys = useLocalStorage('history', [])
+const currentPalette: any = useState('currentPalette', () => {})
+const copySelect = ref('')
+
+const listPalette = computed(() => {
+  const result = [
+    currentPalette.value?.accentClear,
+    currentPalette.value?.accentDull,
+    currentPalette.value?.bg,
+    currentPalette.value?.bgFocus,
+    currentPalette.value?.clear,
+    currentPalette.value?.dull,
+    currentPalette.value?.duller,
+    currentPalette.value?.primaryClear,
+    currentPalette.value?.primaryDull,
+    currentPalette.value?.primaryVisible]
+
+  return result.filter(Boolean)
+})
 
 function isURL(str) {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
@@ -27,14 +45,26 @@ async function generate() {
     loading.value = false
 
     if (palette) {
-      console.log('palette', palette)
+      currentPalette.value = palette
       historys.value = [palette, ...historys.value]
       useGlobalStyleCss().apply(palette)
     }
   }
-
   catch (e) {
     loading.value = false
+  }
+}
+
+async function copy(text: string) {
+  copySelect.value = text
+  setTimeout(() => {
+    copySelect.value = ''
+  }, 1000)
+  try {
+    await navigator.clipboard.writeText(text ?? '')
+  }
+  catch (err) {
+    console.error('Failed to copy: ', err)
   }
 }
 </script>
@@ -65,14 +95,28 @@ async function generate() {
             </div>
             <input
               id="default-search"
-              v-model="prompt" type="search" placeholder="Enter a prompt for AI or Website URL" required=""
+              v-model="prompt" type="search" placeholder="Enter a prompt for AI..."
+              required=""
               class="!focus-visible:border-blue-500 !focus-visible:ring-blue-500 block w-full rounded-lg border border-gray-100 bg-gray-50 p-4 pl-12 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-300"
             >
             <button
               class="absolute right-2.5 bottom-2.5 h-9 w-24 rounded-lg bg-gradient-to-r from-purple-400 to-pink-400 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
               @click="generate"
             >
-              <svg v-if="loading" aria-hidden="true" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2 inline h-4 w-4 animate-spin fill-purple-600 text-gray-200 dark:text-gray-600"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" /><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" /></svg>
+              <svg
+                v-if="loading" aria-hidden="true" viewBox="0 0 100 101" fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-2 inline h-4 w-4 animate-spin fill-purple-600 text-gray-200 dark:text-gray-600"
+              >
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill"
+                />
+              </svg>
               <span v-else> Generate </span>
             </button>
           </div>
@@ -88,84 +132,30 @@ async function generate() {
       <div class="p-4">
         <div class="mb-2 flex items-center p-2">
           <div class="mr-4 hidden border-2 border-gray-100 text-sm shadow-lg md:flex">
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-primary-clear transition-all hover:w-40 text-white">
-              <h6 class="invisible group-hover:visible">
-                #EE1D52
-              </h6><span
+            <button v-for="palette in listPalette" :key="palette" :style="{ 'background-color': palette }" class="colors group relative flex h-16 w-10 items-center justify-center transition-all hover:w-40 text-white" @click="copy(palette)">
+              <h6 :class="{ hidden: copySelect === palette }" class="invisible group-hover:visible">
+                {{ palette }}
+              </h6>
+              <span
+                :class="{ 'opacity-100': copySelect === palette }"
                 class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-primary-visible transition-all hover:w-40 text-black">
-              <h6 class="invisible group-hover:visible">
-                #ffcddf
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-accent-clear transition-all hover:w-40 text-black">
-              <h6 class="invisible group-hover:visible">
-                #FFC107
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-accent-dull transition-all hover:w-40 text-white">
-              <h6 class="invisible group-hover:visible">
-                #916400
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-bg transition-all hover:w-40 text-black">
-              <h6 class="invisible group-hover:visible">
-                #F7F7F7
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-bg-focus transition-all hover:w-40 text-black">
-              <h6 class="invisible group-hover:visible">
-                #ededed
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-duller transition-all hover:w-40 text-black">
-              <h6 class="invisible group-hover:visible">
-                #c4c4c4
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-clear transition-all hover:w-40 text-white">
-              <h6 class="invisible group-hover:visible">
-                #333333
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
-            </button>
-            <button class="group relative flex h-16 w-10 items-center justify-center bg-dull transition-all hover:w-40 text-white">
-              <h6 class="invisible group-hover:visible">
-                #5c5c5c
-              </h6><span
-                class="invisible absolute inset-0 top-4 opacity-0 group-hover:visible"
-              > copied! </span>
+              > copied!
+              </span>
             </button>
           </div>
         </div>
-        <label
-          for="my-modal-6"
-          class="flex cursor-pointer items-center justify-center rounded-md bg-gray-100 px-6 py-3 text-sm text-gray-500 hover:bg-gray-200"
-        ><span
-          class="material-symbols-rounded mr-2"
-        > copy_all </span>
-          Export</label>
-        <input
-          id="my-modal-6"
-          type="checkbox"
-          class="modal-toggle"
-        >
+        <!--        <label -->
+        <!--          for="my-modal-6" -->
+        <!--          class="flex cursor-pointer items-center justify-center rounded-md bg-gray-100 px-6 py-3 text-sm text-gray-500 hover:bg-gray-200" -->
+        <!--        ><span -->
+        <!--          class="material-symbols-rounded mr-2" -->
+        <!--        > copy_all </span> -->
+        <!--          Export</label> -->
+        <!--        <input -->
+        <!--          id="my-modal-6" -->
+        <!--          type="checkbox" -->
+        <!--          class="modal-toggle" -->
+        <!--        > -->
         <!--        <div class="modal modal-bottom sm:modal-middle"> -->
         <!--          <div class="modal-box bg-slate-100"> -->
         <!--            <label -->

@@ -23,12 +23,11 @@ export default defineEventHandler(async (event) => {
     "delete": "#4A4A4A",
     "dull": "#878787",
     "duller": "#FFFFFF",
-    }", my background is: ${body.prompt}`
+    }". my background is: ${body.prompt}`
 
   // if (body.isURL) {
   //   prompts = `
-  //    I want you to act as an professional designer,
-  //    I will provide you a web page Your task is to get the most used colors on that web and the Data you return to me must be in the following format
+  //    I want you to act as an professional designer. I will provide you a web page Your task is to get the most used colors on that web and the Data you return to me must be in the following format
   //   "{
   //     "bg": "#F5F3F7",
   //     "bgFocus": "#E9E4ED",
@@ -40,7 +39,7 @@ export default defineEventHandler(async (event) => {
   //     "delete": "#4A4A4A",
   //     "dull": "#878787",
   //     "duller": "#FFFFFF",
-  //     }"
+  //     }".
   //     That site is "${body.prompt}"
   //   `
   // }
@@ -51,13 +50,14 @@ export default defineEventHandler(async (event) => {
 
   const openai = new OpenAIApi(configuration)
   const completion = await openai.createChatCompletion({
-    model: 'gpt-4',
+    model: 'gpt-3.5-turbo',
     messages: [{ role: 'user', content: prompts }],
   })
 
   if (completion.data.choices[0].message) {
     try {
       const string = completion.data.choices[0].message.content
+      console.log('string', string)
       const jsonStartIndex = string.indexOf('{')
       const jsonEndIndex = string.indexOf('}')
       const jsonString = string.slice(jsonStartIndex, jsonEndIndex + 1)

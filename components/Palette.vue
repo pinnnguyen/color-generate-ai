@@ -15,9 +15,11 @@ const props = defineProps<{
 
 const globalStyle = useGlobalStyleCss()
 const storage = useLocalStorage<number[]>('saved', [])
+const currentPalette = useState('currentPalette', () => {})
 
 function doApply() {
   globalStyle.apply(props.palette)
+  currentPalette.value = props.palette
 }
 
 function saved() {
@@ -45,6 +47,7 @@ function savedOrUnsaved() {
 
 <template>
   <button
+    :class="{ '!bg-gray-400': currentPalette?.id === palette?.id }"
     class="flex w-full items-center justify-center rounded-lg bg-white py-3 px-6 shadow-xl hover:bg-gray-200"
     @click="doApply"
   >

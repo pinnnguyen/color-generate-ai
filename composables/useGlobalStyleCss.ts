@@ -10,8 +10,23 @@ export interface Palette {
   dull: string
   duller: string
 }
+
 export default function useGlobalStyleCss() {
   const initialize = () => {
+    const palette = useState('currentPalette', () => {})
+    palette.value = {
+      bg: '#F5F3F7',
+      bgFocus: '#E9E4ED',
+      primaryClear: '#8B5FBF',
+      primaryDull: '#61398F',
+      primaryVisible: '#FFFFFF',
+      accentClear: '#D6C6E1',
+      accentDull: '#9A73B5',
+      clear: '#4A4A4A',
+      dull: '#878787',
+      duller: '#FFFFFF',
+    }
+
     document.documentElement.style.setProperty('--bg', '#F5F3F7')
     document.documentElement.style.setProperty('--bg-focus', '#E9E4ED')
     document.documentElement.style.setProperty('--primary-clear', '#8B5FBF')
