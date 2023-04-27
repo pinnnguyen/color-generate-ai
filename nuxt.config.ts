@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     'nuxt-icon',
     '@vueuse/nuxt',
+    '@kevinmarrec/nuxt-pwa',
   ],
   app: {
     keepalive: true,
@@ -19,10 +20,6 @@ export default defineNuxtConfig({
       bodyAttrs: {
         class: 'overflow-x-hidden',
       },
-      link: [
-        { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
-        { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
-      ],
       title: 'AI Colors',
       meta: [
         {
@@ -30,6 +27,24 @@ export default defineNuxtConfig({
           content: 'AI Colors',
         },
       ],
+    },
+  },
+  pwa: {
+    manifest: {
+      name: 'AI Colors',
+      short_name: 'AI Colors',
+      start_url: '/',
+      lang: 'en',
+    },
+    meta: {
+      title: 'AI Colors',
+      favicon: true,
+      theme_color: '#FFFFFF',
+      mobileApp: true,
+      mobileAppIOS: true,
+      author: 'Dyrt',
+      ogSiteName: 'Dyrt',
+      description: 'Generate palettes from a text prompt.',
     },
   },
 })
